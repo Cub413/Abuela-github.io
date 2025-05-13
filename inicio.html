@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+    .left-panel {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 10;
+    }
+    .btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      text-align: left;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+    .btn:hover {
+      color: gray;
+    }
+    .center-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 80%;
+      max-height: 80%;
+      -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+      mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 90%);
+      mask-mode: alpha;
+      transition: transform 1s ease, opacity 1s ease;
+    }
+    .credits-panel {
+      position: absolute;
+      left: 20px;
+      top: 150px;
+      width: 80%;
+      max-width: 300px;
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid white;
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .close-btn {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: red;
+    }
+    /* Animación para los botones y la imagen */
+    .btn.clicked {
+      transform: translateX(-100%) translateY(-50%);
+      opacity: 0;
+    }
+    .center-image.clicked {
+      transform: translate(-50%, -40%) scale(0.5);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="left-panel">
+   <div style="font-size: 32px; font-weight: bold; background: linear-gradient(to right, #ff7e5f, #feb47b); -webkit-background-clip: text; color: transparent;">
+  abuela
+</div>
+
+    <button class="btn" id="startBtn" onclick="startGame()">Comenzar</button>
+    <button class="btn" id="continueBtn" onclick="startGame()">Continuar</button>
+    <button class="btn" onclick="document.getElementById('credits').style.display = 'flex'">Créditos</button>
+  </div>
+
+  <img class="center-image" src="pressets/inicioabuela.png" alt="Imagen central">
+
+  <div id="credits" class="credits-panel">
+    <button class="close-btn" onclick="document.getElementById('credits').style.display = 'none'">×</button>
+    <div>Aquí van los créditos del juego...</div>
+  </div>
+
+  <script>
+    function startGame() {
+      // Agregar las clases para la animación al presionar los botones
+      document.getElementById('startBtn').classList.add('clicked');
+      document.getElementById('continueBtn').classList.add('clicked');
+      document.querySelector('.center-image').classList.add('clicked');
+
+      // Redirigir después de la animación (un pequeño delay para permitir que se vean los efectos)
+      setTimeout(function() {
+        window.location.href = 'carga.html';
+      }, 1000); // Este valor debe coincidir con la duración de las animaciones
+    }
+  </script>
+
+</body>
+</html>

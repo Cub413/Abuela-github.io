@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape" />
+  <title>Pantalla de Carga</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .image-container {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 20px;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .loading-text {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+   .dots::after {
+  content: "";
+  animation: dots 3s steps(3, end) infinite;
+}
+
+
+    @keyframes dots {
+      0% { content: ""; }
+      33% { content: "."; }
+      66% { content: ".."; }
+      100% { content: "..."; }
+    }
+
+    .tip-container {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      padding: 0 10px;
+    }
+
+    .tip {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .tip.active {
+      display: block;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="image-container">
+    <img id="loadingImage" src="pressets/player1.png" alt="Cargando" />
+  </div>
+
+  <div class="loading-text">
+    CARGANDO<span class="dots"></span>
+  </div>
+
+  <div class="tip-container">
+    <div class="tip">en la oscuridad,no te ven pero... te pueden escuchar</div>
+    <div class="tip">tus enemigos no son tus amigos</div>
+    <div class="tip">creado a partir de bromas!</div>
+      <div class="tip">mantente silencioso</div>
+       <div class="tip">Donde estoy...,tengo que irme de aqui</div>
+        <div class="tip">la abuela tiene perdida de memoria?</div>
+         <div class="tip">Abuela: I SEE YOU LATER (te veo pronto)</div>
+          <div class="tip">huir si es una opción</div>
+           <div class="tip">desarrollado por 2 personas,es increible!</div>
+            <div class="tip">no temas,tambien es una persona...</div>
+             <div class="tip">aveces solo hay que olvidar...</div>
+              <div class="tip">como te voy a olvidar :D</div>
+               <div class="tip">mmmmm...ya has pensado en ti mismo?</div>
+                <div class="tip">hola..! soy la pantalla de carga</div>
+  </div>
+
+  <script>
+    const img = document.getElementById('loadingImage');
+    const tips = document.querySelectorAll('.tip');
+    let current = 0;
+
+    function switchImage() {
+      img.src = img.src.includes("player1.png")
+        ? "pressets/player2.png"
+        : "pressets/player1.png";
+    }
+
+    function showNextTip() {
+      tips[current].classList.remove('active');
+      current = (current + 1) % tips.length;
+      tips[current].classList.add('active');
+    }
+
+    setInterval(switchImage, 200);
+    setInterval(showNextTip, 5000);
+    document.body.addEventListener('click', showNextTip);
+
+    // Mostrar primer tip
+    tips[0].classList.add('active');
+
+    // Redirigir aleatoriamente en 30, 40, 50 o 60 segundos
+    const delay = [30, 40, 50, 60][Math.floor(Math.random() * 4)] * 1000;
+    setTimeout(() => {
+      window.location.href = "lvl1.html";
+    }, delay);
+  </script>
+
+</body>
+</html>

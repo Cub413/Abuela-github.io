@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #rotar-img {
+      display: none;
+      max-width: 90%;
+      max-height: 90%;
+    }
+  </style>
+</head>
+<body>
+  <img id="rotar-img" src="https://cdn.glitch.global/8be62e87-d2cd-491e-a307-f3d890c23abb/girar-pantalla.png?v=1745233132365">
+
+  <script>
+    function verificarOrientacion() {
+      const esVertical = window.innerHeight > window.innerWidth;
+      const imagen = document.getElementById('rotar-img');
+
+      if (esVertical) {
+        imagen.style.display = 'block';
+      } else {
+        window.location.href = 'principio.html';
+      }
+    }
+
+    window.addEventListener('load', verificarOrientacion);
+    window.addEventListener('resize', verificarOrientacion);
+    window.addEventListener('orientationchange', verificarOrientacion);
+  </script>
+</body>
+</html>
