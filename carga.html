@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, orientation=landscape" />
-  <title>Pantalla de Carga</title>  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <title>Pantalla de Carga</title>  
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -36,11 +37,10 @@
       margin-bottom: 30px;
     }
 
-   .dots::after {
-  content: "";
-  animation: dots 3s steps(3, end) infinite;
-}
-
+    .dots::after {
+      content: "";
+      animation: dots 3s steps(3, end) infinite;
+    }
 
     @keyframes dots {
       0% { content: ""; }
@@ -68,9 +68,41 @@
       display: block;
       opacity: 1;
     }
+
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #startButton {
+      padding: 20px 40px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 16px;
+      color: white;
+      background: rgba(30,30,30,0.8);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s;
+    }
+
+    #startButton:hover {
+      background: rgba(50,50,50,0.9);
+    }
+
   </style>
 </head>
 <body>
+  <div id="startScreen">
+    <button id="startButton">COMENZAR</button>
+  </div>
 
   <div class="image-container">
     <img id="loadingImage" src="pressets/player1.png" alt="Cargando" />
@@ -84,25 +116,27 @@
     <div class="tip">en la oscuridad,no te ven pero... te pueden escuchar</div>
     <div class="tip">tus enemigos no son tus amigos</div>
     <div class="tip">creado a partir de bromas!</div>
-      <div class="tip">mantente silencioso</div>
-       <div class="tip">Donde estoy...,tengo que irme de aqui</div>
-        <div class="tip">la abuela tiene perdida de memoria?</div>
-         <div class="tip">Abuela: I SEE YOU LATER (te veo pronto)</div>
-          <div class="tip">huir si es una opción</div>
-           <div class="tip">desarrollado por 2 personas,es increible!</div>
-            <div class="tip">no temas,tambien es una persona...</div>
-             <div class="tip">aveces solo hay que olvidar...</div>
-              <div class="tip">como te voy a olvidar :D</div>
-               <div class="tip">mmmmm...ya has pensado en ti mismo?</div>
-                <div class="tip">hola..! soy la pantalla de carga</div>
-                   <div class="tip">no es posible que se volviera a escapar!</div>
-                     <div class="tip">paciencia y presupuesto no hay</div>
+    <div class="tip">mantente silencioso</div>
+    <div class="tip">Donde estoy...,tengo que irme de aqui</div>
+    <div class="tip">la abuela tiene perdida de memoria?</div>
+    <div class="tip">Abuela: I SEE YOU LATER (te veo pronto)</div>
+    <div class="tip">huir si es una opción</div>
+    <div class="tip">desarrollado por 2 personas,es increible!</div>
+    <div class="tip">no temas,tambien es una persona...</div>
+    <div class="tip">aveces solo hay que olvidar...</div>
+    <div class="tip">como te voy a olvidar :D</div>
+    <div class="tip">mmmmm...ya has pensado en ti mismo?</div>
+    <div class="tip">hola..! soy la pantalla de carga</div>
+    <div class="tip">no es posible que se volviera a escapar!</div>
+    <div class="tip">paciencia y presupuesto no hay</div>
   </div>
 
   <script>
     const img = document.getElementById('loadingImage');
     const tips = document.querySelectorAll('.tip');
-    let current = 0;
+
+    let remainingTips = Array.from({length: tips.length}, (_, i) => i);
+    let currentTipIndex = null;
 
     function switchImage() {
       img.src = img.src.includes("player1.png")
@@ -111,24 +145,46 @@
     }
 
     function showNextTip() {
-      tips[current].classList.remove('active');
-      current = (current + 1) % tips.length;
-      tips[current].classList.add('active');
+      if (currentTipIndex !== null) {
+        tips[currentTipIndex].classList.remove('active');
+      }
+
+      if (remainingTips.length === 0) {
+        // Reiniciar lista cuando se acabaron todos
+        remainingTips = Array.from({length: tips.length}, (_, i) => i);
+      }
+
+      // Elegir aleatoriamente un índice del array remainingTips
+      const randomIndex = Math.floor(Math.random() * remainingTips.length);
+      currentTipIndex = remainingTips.splice(randomIndex, 1)[0];
+
+      tips[currentTipIndex].classList.add('active');
     }
+
+    // Mostrar un tip inicial aleatorio al cargar
+    showNextTip();
 
     setInterval(switchImage, 200);
     setInterval(showNextTip, 5000);
     document.body.addEventListener('click', showNextTip);
-
-    // Mostrar primer tip
-    tips[0].classList.add('active');
 
     // Redirigir aleatoriamente en 30, 40, 50 o 60 segundos
     const delay = [30, 40, 50, 60][Math.floor(Math.random() * 4)] * 1000;
     setTimeout(() => {
       window.location.href = "lvl1.html";
     }, delay);
-  </script>
 
+    const startScreen = document.getElementById("startScreen");
+    const startButton = document.getElementById("startButton");
+    const ambientSound = new Audio('pressets/ambiental2.mp3');
+    ambientSound.loop = true;
+    ambientSound.volume = 0.5;
+
+    startButton.addEventListener("click", () => {
+      ambientSound.play().catch(() => {});
+      startScreen.style.display = "none";
+    });
+
+  </script>
 </body>
 </html>

@@ -96,9 +96,40 @@
       opacity: 0;
       transition: transform 0.5s ease, opacity 0.5s ease;
     }
+    #startScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#startButton {
+  padding: 20px 40px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  color: white;
+  background: rgba(30,30,30,0.8);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+#startButton:hover {
+  background: rgba(50,50,50,0.9);
+}
+
   </style>
 </head>
 <body>
+<div id="startScreen">
+  <button id="startButton">COMENZAR</button>
+</div>
 
   <div class="left-panel">
     <div id="title" style="font-size: 32px; font-weight: bold;
@@ -139,6 +170,17 @@
     function showCredits() {
       document.getElementById('credits').style.display = 'flex';
     }
+    const startScreen = document.getElementById("startScreen");
+const startButton = document.getElementById("startButton");
+const ambientSound = new Audio('pressets/ambiental.mp3');
+ambientSound.loop = true;
+ambientSound.volume = 0.5;
+
+startButton.addEventListener("click", () => {
+  ambientSound.play().catch(() => {});
+  startScreen.style.display = "none";
+});
+
   </script>
 
 </body>
