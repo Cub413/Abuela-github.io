@@ -2,12 +2,14 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     html, body {
       margin: 0; padding: 0;
       overflow: hidden;
       background: #222;
       touch-action: none;
+      
     }
     canvas {
       display: block;
@@ -24,16 +26,63 @@
       background: #ccc; border-radius: 50%;
       top: 30px; left: 30px;
     }
-  #linterna {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  background: radial-gradient(circle at center, transparent 5px, rgba(0, 0, 0, 1) 100px);
-  transition: background 0.3s ease;
-}
+    #linterna {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 5px, rgba(0, 0, 0, 1) 100px);
+      transition: background 0.3s ease;
+    }
 
+    /* Estilos pantalla de muerte */
+    #deathScreen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      display: flex;
+    }
+
+    #deathContent {
+      background: linear-gradient(to right, #5F5F5F, #ABABAB);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 20px #000;
+    }
+
+    #deathContent h1 {
+      color: white;
+      font-family: 'Press Start 2P', monospace;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    #deathContent button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 16px;
+      
+      border: none;
+      border-radius: 5px;
+      background: #FF0000;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #deathContent button:hover {
+      background: #777;
+    }
   </style>
 </head>
 <body>
@@ -41,6 +90,15 @@
 <div id="linterna"></div>
 
 <div id="joystick"><div id="stick"></div></div>
+
+<!-- Pantalla de muerte -->
+<div id="deathScreen">
+  <div id="deathContent">
+    <h1>Has muerto</h1>
+    <button onclick="resetGame()">Reintentar</button>
+    <button onclick="window.location.href='inicio.html'">Rendirse</button>
+  </div>
+</div>
 
 <script>
 const canvas = document.getElementById("game");
@@ -89,21 +147,52 @@ enemy.images[0].src = "pressets/enemigo1.jpg";
 enemy.images[1].src = "pressets/enemigo2.jpg";
 
 const walls = [
-  { x: 0, y: 0, w: 800, h: 20, color: "#666" },
-  { x: 0, y: 580, w: 800, h: 20, color: "#444" },
-  { x: 0, y: 0, w: 20, h: 600, color: "#444" },
-  { x: 780, y: 0, w: 20, h: 600, color: "#444" },
-  { x: 200, y: 0, w: 20, h: 220, color: "#666" },
-  { x: 400, y: 0, w: 20, h: 200, color: "#666" },
-  { x: 0, y: 200, w: 150, h: 20, color: "#666" },
+  { x: 0, y: 0, w: 800, h: 20, color: "#777" },
+  { x: 0, y: 580, w: 800, h: 20, color: "#777" },
+  { x: 0, y: 0, w: 20, h: 600, color: "#777" },
+  { x: 780, y: 0, w: 20, h: 600, color: "#777" },
+  { x: 200, y: 0, w: 20, h: 150, color: "#777" },
+  { x: 400, y: 0, w: 20, h: 200, color: "#777" },
+  { x: 0, y: 200, w: 150, h: 20, color: "#777" },
   { x: 100, y: 300, w: 600, h: 20, color: "#777" },
-  { x: 300, y: 300, w: 20, h: 280, color: "#666" },
-  { x: 500, y: 300, w: 20, h: 240, color: "#666" },
-  { x: 200, y: 200, w: 200, h: 20, color: "#666" }
+  { x: 300, y: 300, w: 20, h: 280, color: "#777" },
+  { x: 500, y: 300, w: 20, h: 230, color: "#777" },
+  { x: 200, y: 200, w: 200, h: 20, color: "#777" }
 ];
+let objetos = [];
+
+// Crear cinco texturas diferentes
+let texturasObjetos = [
+  new Image(), new Image(), new Image(), new Image(), new Image()
+];
+
+texturasObjetos[0].src = "pressets/cama.png";
+texturasObjetos[1].src = "pressets/armario.png";
+texturasObjetos[2].src = "pressets/otroarmario.png";
+texturasObjetos[3].src = "pressets/mesa.png";
+texturasObjetos[4].src = "pressets/armario.png";
+
+// Añadir 5 objetos al array
+objetos.push({ x: 20, y: 150, w: 40, h: 50, textura: texturasObjetos[0] });
+objetos.push({ x: 220, y: 20, w: 40, h: 60, textura: texturasObjetos[1] });
+objetos.push({ x: 240, y: 320, w: 60, h: 80, textura: texturasObjetos[2] });
+objetos.push({ x: 500, y: 100, w: 50, h: 50, textura: texturasObjetos[3] });
+objetos.push({ x: 317, y: 500, w: 60, h: 80, textura: texturasObjetos[4] });
 
 let vx = 0, vy = 0;
 let tick = 0;
+const playerStepSound = new Audio('pressets/pasos.mp3');
+playerStepSound.loop = true;
+playerStepSound.volume = 0;
+playerStepSound.playbackRate = 1.8;
+
+const enemyStepSound = new Audio('pressets/pasos.mp3');
+enemyStepSound.loop = true;
+enemyStepSound.volume = 0;
+enemyStepSound.playbackRate = 1.8;
+const ambientSound = new Audio('pressets/ambiental.mp3');
+ambientSound.loop = true;
+ambientSound.volume = 0.5;
 
 const stick = document.getElementById("stick");
 let dragging = false, origin = {x: 0, y: 0};
@@ -146,6 +235,11 @@ function checkCollision(x, y, w = player.w, h = player.h) {
       return true;
     }
   }
+  for (let obj of objetos) {
+    if (checkCollisionRect(x, y, w, h, obj.x, obj.y, obj.w, obj.h)) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -180,15 +274,35 @@ function moveEnemy() {
 
   enemy.tick++;
 }
+joystick.addEventListener("touchstart", (e) => {
+  dragging = true;
+
+  // Iniciar sonido ambiental al primer toque
+  if (ambientSound.paused) {
+    ambientSound.play().catch(() => {});
+  }
+}, { passive: false });
 
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   if (!dead) {
-  const nextX = player.x + vx;
-  const nextY = player.y + vy;
-  if (!checkCollision(nextX, player.y)) player.x = nextX;
-  if (!checkCollision(player.x, nextY)) player.y = nextY;
+    const nextX = player.x + vx;
+    const nextY = player.y + vy;
+    if (!checkCollision(nextX, player.y)) player.x = nextX;
+    if (!checkCollision(player.x, nextY)) player.y = nextY;
+  }
+// Sonido de pasos del jugador con volumen por velocidad
+const playerSpeed = Math.hypot(vx, vy);
+const maxSpeed = player.speed;
+const playerVolume = Math.min(1, playerSpeed / maxSpeed);
+
+playerStepSound.volume = playerVolume;
+
+if (playerVolume > 0.05) {
+  if (playerStepSound.paused) playerStepSound.play();
+} else {
+  if (!playerStepSound.paused) playerStepSound.pause();
 }
 
   camX = player.x + player.w/2 - canvas.width / 2;
@@ -201,23 +315,33 @@ function loop() {
   if (tick % 15 === 0) {
     enemy.frame = (enemy.frame + 1) % 2;
   }
-if (!dead) {
-  const touching = checkCollisionRect(player.x, player.y, player.w, player.h, enemy.x, enemy.y, enemy.w, enemy.h);
-  if (touching) {
-    contactTime += 1 / 60;
-    if (contactTime >= 2) {
-      dead = true;
-      shake = 10;
-      setTimeout(() => {
-        resetGame();
-      }, 000);
+
+  if (!dead) {
+    const touching = checkCollisionRect(player.x, player.y, player.w, player.h, enemy.x, enemy.y, enemy.w, enemy.h);
+    if (touching) {
+      contactTime += 1 / 60;
+      if (contactTime >= 2) {
+        dead = true;
+        shake = 10;
+        document.getElementById("deathScreen").style.display = "flex";
+      }
+    } else {
+      contactTime = 0;
     }
-  } else {
-    contactTime = 0;
   }
-}
 
   moveEnemy();
+// Sonido del enemigo con atenuación por distancia
+const distToPlayer = distanceBetween(player.x, player.y, enemy.x, enemy.y);
+const maxDist = 900;
+const vol = Math.max(0, 1 - distToPlayer / maxDist);
+enemyStepSound.volume = vol;
+
+if (enemy.chasing && vol > 0.05) {
+  if (enemyStepSound.paused) enemyStepSound.play();
+} else {
+  if (!enemyStepSound.paused) enemyStepSound.pause();
+}
 
   ctx.save();
   ctx.translate(-camX, -camY);
@@ -230,22 +354,27 @@ if (!dead) {
     ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
   }
 
-// Jugador
-ctx.save();
-ctx.translate(player.x + player.w/2, player.y + player.h/2);
+  // Objetos
+  for (let obj of objetos) {
+    ctx.drawImage(obj.textura, obj.x, obj.y, obj.w, obj.h);
+  }
 
-// Temblor al morir
-if (dead && shake > 0) {
-  ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
-  shake *= 0.95; // va disminuyendo
-}
+  // Jugador
+  ctx.save();
+  ctx.translate(player.x + player.w/2, player.y + player.h/2);
 
-if (player.flip) ctx.scale(-1, 1);
-if (dead && fadeOut > 0) fadeOut -= 0.01;
-ctx.globalAlpha = Math.max(0, fadeOut);
-ctx.drawImage(player.images[player.frame], -player.w/2, -player.h/2, player.w, player.h);
-ctx.restore();
-ctx.globalAlpha = 1;
+  // Temblor al morir
+  if (dead && shake > 0) {
+    ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+    shake *= 0.95; // va disminuyendo
+  }
+
+  if (player.flip) ctx.scale(-1, 1);
+  if (dead && fadeOut > 0) fadeOut -= 0.01;
+  ctx.globalAlpha = Math.max(0, fadeOut);
+  ctx.drawImage(player.images[player.frame], -player.w/2, -player.h/2, player.w, player.h);
+  ctx.restore();
+  ctx.globalAlpha = 1;
 
   // Enemigo
   ctx.save();
@@ -259,6 +388,7 @@ ctx.globalAlpha = 1;
 }
 
 loop();
+
 function resetGame() {
   player.x = 100;
   player.y = 100;
@@ -272,7 +402,10 @@ function resetGame() {
   vy = 0;
   stick.style.left = "30px";
   stick.style.top = "30px";
+
+  document.getElementById("deathScreen").style.display = "none";
 }
+document.getElementById("deathScreen").style.display = "none";
 
 </script>
 </body>

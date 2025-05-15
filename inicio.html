@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       background: black;
       color: white;
-      font-family: 'Courier New', monospace;
+      font-family: 'Press Start 2P', monospace;
       overflow: hidden;
     }
+
     .left-panel {
       position: absolute;
       left: 20px;
@@ -20,19 +22,23 @@
       gap: 20px;
       z-index: 10;
     }
+
     .btn {
+      font-family: 'Press Start 2P', monospace;
       background: none;
       border: none;
       color: white;
-      font-size: 24px;
+      font-size: 15px;
       text-align: left;
       padding: 0;
       cursor: pointer;
       transition: transform 0.5s ease, opacity 0.5s ease;
     }
+
     .btn:hover {
       color: gray;
     }
+
     .center-image {
       position: absolute;
       top: 50%;
@@ -45,19 +51,22 @@
       mask-mode: alpha;
       transition: transform 1s ease, opacity 1s ease;
     }
+
     .credits-panel {
       position: absolute;
-      left: 20px;
-      top: 150px;
+      left: 300px;
+      top: 10px;
       width: 80%;
       max-width: 300px;
-      background: rgba(0, 0, 0, 0.9);
+      background: black;
       border: 1px solid white;
       padding: 20px;
       display: none;
+      font-family: 'Press Start 2P', monospace;
       flex-direction: column;
       gap: 10px;
     }
+
     .close-btn {
       align-self: flex-end;
       background: none;
@@ -66,50 +75,69 @@
       font-size: 20px;
       cursor: pointer;
     }
+
     .close-btn:hover {
       color: red;
     }
-    /* Animación para los botones y la imagen */
+
     .btn.clicked {
       transform: translateX(-100%) translateY(-50%);
       opacity: 0;
     }
+
     .center-image.clicked {
-      transform: translate(-50%, -40%) scale(0.5);
+      transform: translate(-50%, -40%) scale(10);
       opacity: 0;
+    }
+
+    #title.clicked,
+    #creditsBtn.clicked {
+      transform: translateX(-100%) translateY(-50%);
+      opacity: 0;
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
   </style>
 </head>
 <body>
 
   <div class="left-panel">
-   <div style="font-size: 32px; font-weight: bold; background: linear-gradient(to right, #ff7e5f, #feb47b); -webkit-background-clip: text; color: transparent;">
-  abuela
-</div>
+    <div id="title" style="font-size: 32px; font-weight: bold;
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      -webkit-background-clip: text;
+      color: transparent;">
+      abuela
+    </div>
 
-    <button class="btn" id="startBtn" onclick="startGame()">Comenzar</button>
-    <button class="btn" id="continueBtn" onclick="startGame()">Continuar</button>
-    <button class="btn" onclick="document.getElementById('credits').style.display = 'flex'">Créditos</button>
+    <button class="btn" id="startBtn" onclick="startGame(this)">Comenzar</button>
+    <button class="btn" id="continueBtn" onclick="startGame(this)">Continuar</button>
+    <button class="btn" id="creditsBtn" onclick="showCredits()">Créditos</button>
   </div>
 
   <img class="center-image" src="pressets/inicioabuela.png" alt="Imagen central">
 
   <div id="credits" class="credits-panel">
     <button class="close-btn" onclick="document.getElementById('credits').style.display = 'none'">×</button>
-    <div>Aquí van los créditos del juego...</div>
+    <h3>desarrolladores</h3>
+    <h5>+ALEJANDRO</h5>
+    <h5>+WALISON</h5>
   </div>
 
   <script>
-    function startGame() {
-      // Agregar las clases para la animación al presionar los botones
+    function startGame(btn) {
+      btn.classList.add('clicked');
       document.getElementById('startBtn').classList.add('clicked');
       document.getElementById('continueBtn').classList.add('clicked');
+      document.getElementById('creditsBtn').classList.add('clicked');
+      document.getElementById('title').classList.add('clicked');
       document.querySelector('.center-image').classList.add('clicked');
 
-      // Redirigir después de la animación (un pequeño delay para permitir que se vean los efectos)
-      setTimeout(function() {
+      setTimeout(() => {
         window.location.href = 'carga.html';
-      }, 1000); // Este valor debe coincidir con la duración de las animaciones
+      }, 1000);
+    }
+
+    function showCredits() {
+      document.getElementById('credits').style.display = 'flex';
     }
   </script>
 
