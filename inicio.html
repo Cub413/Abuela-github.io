@@ -53,19 +53,22 @@
     }
 
     .credits-panel {
-      position: absolute;
-      left: 300px;
-      top: 10px;
-      width: 80%;
-      max-width: 300px;
-      background: black;
-      border: 1px solid white;
-      padding: 20px;
-      display: none;
-      font-family: 'Press Start 2P', monospace;
-      flex-direction: column;
-      gap: 10px;
-    }
+  position: absolute;
+  left: 300px;
+  top: 10px;
+  width: 80%;
+  max-width: 300px;
+  max-height: 200px;
+  background: black;
+  border: 1px solid white;
+  padding: 20px;
+  display: none;
+  font-family: 'Press Start 2P', monospace;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
 
     .close-btn {
       align-self: flex-end;
@@ -123,6 +126,14 @@
 #startButton:hover {
   background: rgba(50,50,50,0.9);
 }
+h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  color: red;
+  text-align: center;
+  margin: 10px 0;
+  text-shadow: 1px 1px 0 #444;
+}
 
   </style>
 </head>
@@ -133,7 +144,7 @@
 
   <div class="left-panel">
     <div id="title" style="font-size: 32px; font-weight: bold;
-      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      background: linear-gradient(to right, red, blanchedalmond);
       -webkit-background-clip: text;
       color: transparent;">
       abuela
@@ -151,6 +162,14 @@
     <h3>desarrolladores</h3>
     <h5>+ALEJANDRO</h5>
     <h5>+WALISON</h5>
+    <h3>artistas</h3>
+    <h5>Jordan</h5>
+    <h5>Maria</h5>
+    <h5>Alejandro</h5>
+    <h3>musica y sonido</h3>
+    <h5>Walison</h5>
+    <h3>codigos y programación </h3>
+    <h5>ALEJANDRO </h5>
   </div>
 
   <script>
