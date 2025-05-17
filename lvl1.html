@@ -122,7 +122,7 @@ const player = {
   y: 100,
   w: 32,
   h: 32,
-  speed: 2,
+  speed: 0.9,
   flip: false,
   frame: 0,
   images: [new Image(), new Image()]
@@ -171,6 +171,24 @@ texturasObjetos[1].src = "pressets/armario.png";
 texturasObjetos[2].src = "pressets/otroarmario.png";
 texturasObjetos[3].src = "pressets/mesa.png";
 texturasObjetos[4].src = "pressets/armario.png";
+const texturasPL = {
+  llave: new Image(),
+  puerta: new Image(),
+  puertaAbierta: new Image()
+};
+texturasPL.llave.src = "pressets/llave.png";
+texturasPL.puerta.src = "pressets/puerta.jpg";
+texturasPL.puertaAbierta.src = "pressets/puertacerrada.png";
+
+const puertayllave = [
+  { x: 250, y: 550, w: 20, h: 25, tipo: "llave", recogida: false },
+  { x: 200, y: 220, w: 60, h: 80, tipo: "puerta", abierta: false }
+];
+
+let tieneLlavePL = false;
+const iconoSonido = new Image();
+iconoSonido.src = "pressets/sonido.png";
+const distanciaIconoSonido = 150; // Ajusta este valor para más o menos alcance
 
 // Añadir 5 objetos al array
 objetos.push({ x: 20, y: 150, w: 40, h: 50, textura: texturasObjetos[0] });
@@ -178,6 +196,36 @@ objetos.push({ x: 220, y: 20, w: 40, h: 60, textura: texturasObjetos[1] });
 objetos.push({ x: 240, y: 320, w: 60, h: 80, textura: texturasObjetos[2] });
 objetos.push({ x: 500, y: 100, w: 50, h: 50, textura: texturasObjetos[3] });
 objetos.push({ x: 317, y: 500, w: 60, h: 80, textura: texturasObjetos[4] });
+const texturasExtra = {
+  llave2: new Image(),
+  llave3: new Image(),
+  puerta2: new Image(),
+  puerta3: new Image(),
+  puertaAbierta: new Image()
+};
+
+texturasExtra.llave2.src = "pressets/llave.png";
+texturasExtra.llave3.src = "pressets/llave.png";
+texturasExtra.puerta2.src = "pressets/puerta.jpg";
+texturasExtra.puerta3.src = "/pressets/puerta.jpg";
+texturasExtra.puertaAbierta.src = "/pressets/puertacerrada.png";
+
+const llavesExtras = [
+  { x: 600, y: 30, w: 20, h: 20, recogida: false, id: "llave2" },
+  { x: 550, y: 350, w: 20, h: 20, recogida: false, id: "llave3" }
+];
+
+const puertasExtras = [
+  { x: 700, y: 299, w: 80, h: 20, abierta: false, id: "puerta2", llave: "llave2" },
+  { x: 500, y: 530, w: 20, h: 50, abierta: false, id: "puerta3", llave: "llave3" }
+];
+// Este código va en cada nivel
+localStorage.setItem('lastLevel', 'lvl1.html'); // Reemplazá por el nivel correspondiente
+
+let llavesObtenidas = {
+  llave2: false,
+  llave3: false,
+};
 
 let vx = 0, vy = 0;
 let tick = 0;
@@ -224,6 +272,9 @@ document.getElementById("joystick").addEventListener("touchend", () => {
   stick.style.left = "30px";
   stick.style.top = "30px";
 });
+function colisionPL(a, b) {
+  return !(a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h);
+}
 
 function checkCollisionRect(ax, ay, aw, ah, bx, by, bw, bh) {
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
@@ -235,12 +286,28 @@ function checkCollision(x, y, w = player.w, h = player.h) {
       return true;
     }
   }
+  for (let obj of puertayllave) {
+  if (obj.tipo === "puerta" && !obj.abierta) {
+    if (checkCollisionRect(x, y, w, h, obj.x, obj.y, obj.w, obj.h)) {
+      return true;
+    }
+  }
+}
+for (let puerta of puertasExtras) {
+  if (!puerta.abierta && checkCollisionRect(x, y, w, h, puerta.x, puerta.y, puerta.w, puerta.h)) {
+    return true;
+  }
+}
+
   for (let obj of objetos) {
     if (checkCollisionRect(x, y, w, h, obj.x, obj.y, obj.w, obj.h)) {
       return true;
     }
   }
   return false;
+}
+function colisionPL(a, b) {
+  return !(a.x + a.w <= b.x || a.x >= b.x + b.w || a.y + a.h <= b.y || a.y >= b.y + b.h);
 }
 
 function distanceBetween(x1, y1, x2, y2) {
@@ -276,6 +343,11 @@ function moveEnemy() {
 }
 joystick.addEventListener("touchstart", (e) => {
   dragging = true;
+for (let puerta of puertasExtras) {
+  if (!puerta.abierta && checkCollisionRect(x, y, w, h, puerta.x, puerta.y, puerta.w, puerta.h)) {
+    return true;
+  }
+}
 
   // Iniciar sonido ambiental al primer toque
   if (ambientSound.paused) {
@@ -286,14 +358,127 @@ joystick.addEventListener("touchstart", (e) => {
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  const prevX = player.x;
+  const prevY = player.y;
+
+  // Mover en X
+  player.x += vx;
+
+  let colisionX = false;
+
+  for (let wall of walls) {
+    if (colisionPL(player, wall)) {
+      colisionX = true;
+      break;
+    }
+  }
+
+  for (let obj of objetos) {
+    if (colisionPL(player, obj)) {
+      colisionX = true;
+      break;
+    }
+  }
+
+  // Colisión con puertasExtras cerradas
+  for (let puerta of puertasExtras) {
+    if (!puerta.abierta && colisionPL(player, puerta)) {
+      if (llavesObtenidas[puerta.llave]) {
+        puerta.abierta = true;
+      } else {
+        colisionX = true;
+      }
+    }
+  }
+
+  // Colisión con puerta original
+  for (let obj of puertayllave) {
+    if (obj.tipo === "puerta" && !obj.abierta && colisionPL(player, obj)) {
+      if (tieneLlavePL) {
+        obj.abierta = true;
+      } else {
+        colisionX = true;
+      }
+    }
+  }
+
+  if (colisionX) {
+    player.x = prevX;
+    vx = 0;
+  }
+
+  // Mover en Y
+  player.y += vy;
+
+  let colisionY = false;
+
+  for (let wall of walls) {
+    if (colisionPL(player, wall)) {
+      colisionY = true;
+      break;
+    }
+  }
+
+  for (let obj of objetos) {
+    if (colisionPL(player, obj)) {
+      colisionY = true;
+      break;
+    }
+  }
+
+  // Colisión con puertasExtras cerradas
+  for (let puerta of puertasExtras) {
+    if (!puerta.abierta && colisionPL(player, puerta)) {
+      if (llavesObtenidas[puerta.llave]) {
+        puerta.abierta = true;
+      } else {
+        colisionY = true;
+      }
+    }
+  }
+
+  // Colisión con puerta original
+  for (let obj of puertayllave) {
+    if (obj.tipo === "puerta" && !obj.abierta && colisionPL(player, obj)) {
+      if (tieneLlavePL) {
+        obj.abierta = true;
+      } else {
+        colisionY = true;
+      }
+    }
+  }
+
+  if (colisionY) {
+    player.y = prevY;
+    vy = 0;
+  }
+
+  // Recoger llaves nuevas
+  for (let llave of llavesExtras) {
+    if (!llave.recogida && colisionPL(player, llave)) {
+      llave.recogida = true;
+      llavesObtenidas[llave.id] = true;
+    }
+  }
+
+  // Recoger llave original
+  for (let obj of puertayllave) {
+    if (obj.tipo === "llave" && !obj.recogida && colisionPL(player, obj)) {
+      obj.recogida = true;
+      tieneLlavePL = true;
+    }
+  }
+
   if (!dead) {
     const nextX = player.x + vx;
     const nextY = player.y + vy;
     if (!checkCollision(nextX, player.y)) player.x = nextX;
     if (!checkCollision(player.x, nextY)) player.y = nextY;
   }
-// Sonido de pasos del jugador con volumen por velocidad
-const playerSpeed = Math.hypot(vx, vy);
+
+  // Sonido de pasos del jugador con volumen por velocidad
+  const playerSpeed = Math.hypot(vx, vy);
+
 const maxSpeed = player.speed;
 const playerVolume = Math.min(1, playerSpeed / maxSpeed);
 
@@ -317,6 +502,7 @@ if (playerVolume > 0.05) {
   }
 
   if (!dead) {
+    
     const touching = checkCollisionRect(player.x, player.y, player.w, player.h, enemy.x, enemy.y, enemy.w, enemy.h);
     if (touching) {
       contactTime += 1 / 60;
@@ -333,7 +519,7 @@ if (playerVolume > 0.05) {
   moveEnemy();
 // Sonido del enemigo con atenuación por distancia
 const distToPlayer = distanceBetween(player.x, player.y, enemy.x, enemy.y);
-const maxDist = 900;
+const maxDist = 1000;
 const vol = Math.max(0, 1 - distToPlayer / maxDist);
 enemyStepSound.volume = vol;
 
@@ -358,6 +544,18 @@ if (enemy.chasing && vol > 0.05) {
   for (let obj of objetos) {
     ctx.drawImage(obj.textura, obj.x, obj.y, obj.w, obj.h);
   }
+for (let llave of llavesExtras) {
+  if (!llave.recogida) {
+    const img = llave.id === "llave2" ? texturasExtra.llave2 : texturasExtra.llave3;
+    ctx.drawImage(img, llave.x, llave.y, llave.w, llave.h);
+  }
+}
+
+for (let puerta of puertasExtras) {
+  const img = puerta.abierta ? texturasExtra.puertaAbierta :
+              puerta.id === "puerta2" ? texturasExtra.puerta2 : texturasExtra.puerta3;
+  ctx.drawImage(img, puerta.x, puerta.y, puerta.w, puerta.h);
+}
 
   // Jugador
   ctx.save();
@@ -375,6 +573,35 @@ if (enemy.chasing && vol > 0.05) {
   ctx.drawImage(player.images[player.frame], -player.w/2, -player.h/2, player.w, player.h);
   ctx.restore();
   ctx.globalAlpha = 1;
+for (let obj of puertayllave) {
+  if (obj.tipo === "llave" && obj.recogida) continue;
+
+  let img = obj.tipo === "llave"
+    ? texturasPL.llave
+    : (obj.abierta ? texturasPL.puertaAbierta : texturasPL.puerta);
+
+  if (img && img.complete) {
+    ctx.drawImage(img, obj.x, obj.y, obj.w, obj.h);
+  }
+}
+// Icono de sonido si el enemigo está cerca
+const dxIcono = enemy.x + enemy.w / 2 - (player.x + player.w / 2);
+const dyIcono = enemy.y + enemy.h / 2 - (player.y + player.h / 2);
+const distancia = Math.hypot(dxIcono, dyIcono);
+
+if (distancia < distanciaIconoSonido) {
+  const angulo = Math.atan2(dyIcono, dxIcono);
+  const radio = 50; // Distancia del icono alrededor del jugador (ajustable)
+
+  const iconoX = player.x + player.w / 2 + Math.cos(angulo) * radio;
+  const iconoY = player.y + player.h / 2 + Math.sin(angulo) * radio;
+
+  ctx.save();
+  ctx.translate(iconoX, iconoY); // Posición circular alrededor del jugador
+  ctx.rotate(angulo - Math.PI / 2); // Apunta con la parte de arriba del icono hacia el enemigo
+  ctx.drawImage(iconoSonido, -16, -16, 64, 64); // Tamaño del icono
+  ctx.restore();
+}
 
   // Enemigo
   ctx.save();

@@ -7,95 +7,121 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: 'Press Start 2P', monospace;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
+  margin: 0;
+  background: #000000;
 
-    .image-container {
-      width: 150px;
-      height: 150px;
-      margin-bottom: 20px;
-    }
+  font-family: 'Press Start 2P', monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  text-shadow: 0 0 6px #550000, 0 0 12px #aa0000;
+}
 
-    .image-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+.image-container {
+  width: 140px;
+  height: 140px;
+  margin-bottom: 30px;
+  filter: drop-shadow(0 0 10px #aa0000);
+  animation: flicker 3s infinite;
+}
 
-    .loading-text {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
 
-    .dots::after {
-      content: "";
-      animation: dots 3s steps(3, end) infinite;
-    }
+.loading-text {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 50px;
+  color: #ff4444;
+  letter-spacing: 0.12em;
+  user-select: none;
+  text-shadow: 0 0 12px #ff4444, 0 0 20px #aa0000;
+}
 
-    @keyframes dots {
-      0% { content: ""; }
-      33% { content: "."; }
-      66% { content: ".."; }
-      100% { content: "..."; }
-    }
+.dots::after {
+  content: "";
+  animation: dots 1.6s steps(3, end) infinite;
+  color: #ff4444;
+  text-shadow: none;
+}
 
-    .tip-container {
-      position: absolute;
-      bottom: 15px;
-      width: 100%;
-      text-align: center;
-      font-size: 14px;
-      padding: 0 10px;
-    }
+@keyframes dots {
+  0% { content: ""; }
+  33% { content: "."; }
+  66% { content: ".."; }
+  100% { content: "..."; }
+}
 
-    .tip {
-      display: none;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
+@keyframes flicker {
+  0%, 100% { filter: drop-shadow(0 0 12px #aa0000); }
+  50% { filter: drop-shadow(0 0 25px #ff4444); }
+}
 
-    .tip.active {
-      display: block;
-      opacity: 1;
-    }
+.tip-container {
+  position: absolute;
+  bottom: 25px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  padding: 0 20px;
+  color: #cc5555;
+  user-select: none;
+  max-width: 600px;
+  margin: 0 auto;
+  letter-spacing: 0.05em;
+  font-style: italic;
+  text-shadow: 0 0 8px #660000;
+}
 
-    #startScreen {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
+.tip {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  line-height: 1.4;
+}
 
-    #startButton {
-      padding: 20px 40px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 16px;
-      color: white;
-      background: rgba(30,30,30,0.8);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s;
-    }
+.tip.active {
+  display: block;
+  opacity: 1;
+}
 
-    #startButton:hover {
-      background: rgba(50,50,50,0.9);
-    }
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(14px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#startButton {
+  padding: 20px 40px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  color: #ff5555;
+  background: transparent;
+  border: 2px solid #ff5555;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.4s, color 0.4s, box-shadow 0.4s;
+  box-shadow: 0 0 14px #ff5555;
+}
+
+#startButton:hover {
+  background: #ff5555;
+  color: #000;
+  box-shadow: 0 0 30px #ff5555;
+}
 
   </style>
 </head>
@@ -168,11 +194,20 @@
     setInterval(showNextTip, 5000);
     document.body.addEventListener('click', showNextTip);
 
-    // Redirigir aleatoriamente en 30, 40, 50 o 60 segundos
-    const delay = [30, 40, 50, 60][Math.floor(Math.random() * 4)] * 1000;
-    setTimeout(() => {
-      window.location.href = "lvl1.html";
-    }, delay);
+const continuar = localStorage.getItem('continuar') === '1';
+let destino;
+
+if (continuar) {
+  destino = localStorage.getItem('targetLevel') || 'lvl1.html';
+} else {
+  destino = 'lvl1.html';
+}
+
+// Redirigir tras un tiempo aleatorio
+const delay = [25, 30, 40, 10][Math.floor(Math.random() * 4)] * 1000;
+setTimeout(() => {
+  window.location.href = destino;
+}, delay);
 
     const startScreen = document.getElementById("startScreen");
     const startButton = document.getElementById("startButton");

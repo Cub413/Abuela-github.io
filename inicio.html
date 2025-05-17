@@ -4,203 +4,330 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: 'Press Start 2P', monospace;
-      overflow: hidden;
-    }
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    font-family: 'Press Start 2P', monospace;
+    overflow: hidden;
+    color: white;
+  }
 
-    .left-panel {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      z-index: 10;
-    }
+  /* Fondo de niebla animada */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('pressets/negro.jpeg') repeat;
+    opacity: 0.15;
+    animation: fogMove 60s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .btn {
-      font-family: 'Press Start 2P', monospace;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 15px;
-      text-align: left;
-      padding: 0;
-      cursor: pointer;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
+  @keyframes fogMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 0; }
+  }
 
-    .btn:hover {
-      color: gray;
-    }
+  .left-panel {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 10;
+  }
 
-    .center-image {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 80%;
-      max-height: 80%;
-      -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-      mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 90%);
-      mask-mode: alpha;
-      transition: transform 1s ease, opacity 1s ease;
-    }
+  #title {
+    font-size: 36px;
+    font-weight: bold;
+    background: linear-gradient(90deg, red 40%, blanchedalmond 60%);
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: flicker 3s infinite;
+    user-select: none;
+  }
 
-    .credits-panel {
+  @keyframes flicker {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.6) drop-shadow(0 0 8px red); }
+  }
+
+  .btn {
+    font-family: 'Press Start 2P', monospace;
+    background: none;
+    border: 2px solid white;
+    color: white;
+    font-size: 16px;
+    padding: 10px 15px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s ease;
+  }
+
+  .btn:hover {
+    color: red;
+    border-color: red;
+  }
+
+  /* Glitch effect */
+  .btn::before,
+  .btn::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    right: 0;
+    color: white;
+    background: none;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    opacity: 0.8;
+    animation: glitch 2s infinite;
+    pointer-events: none;
+  }
+
+  .btn::after {
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    animation-delay: 1s;
+  }
+
+  @keyframes glitch {
+    0% {
+      transform: translate(0);
+      opacity: 0.8;
+    }
+    20% {
+      transform: translate(-2px, 2px);
+      opacity: 0.5;
+    }
+    40% {
+      transform: translate(2px, -2px);
+      opacity: 0.8;
+    }
+    60% {
+      transform: translate(-2px, 0);
+      opacity: 0.5;
+    }
+    80% {
+      transform: translate(2px, 2px);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(0);
+      opacity: 0.8;
+    }
+  }
+
+.center-image {
   position: absolute;
-  left: 300px;
-  top: 10px;
-  width: 80%;
-  max-width: 300px;
-  max-height: 200px;
-  background: black;
-  border: 1px solid white;
-  padding: 20px;
-  display: none;
-  font-family: 'Press Start 2P', monospace;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  max-height: 80%;
+  transition: transform 1s ease, opacity 1s ease;
+
+  /* Fondo negro en los bordes */
+  mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 100%);
+  
+  /* También aplicamos sombra para suavizar más la fusión */
+  filter: drop-shadow(0 0 100px black);
 }
 
+  @keyframes pulse {
+    0%, 100% { filter: drop-shadow(0 0 5px red); transform: translate(-50%, -50%) scale(1); }
+    50% { filter: drop-shadow(0 0 20px red); transform: translate(-50%, -50%) scale(1.05); }
+  }
 
-    .close-btn {
-      align-self: flex-end;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-    }
+  .credits-panel {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300px;
+    max-height: 250px;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid red;
+    padding: 20px;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    color: #ff5555;
+    font-family: 'Press Start 2P', monospace;
+    z-index: 20;
+    box-shadow: 0 0 20px red;
+    user-select: none;
+  }
 
-    .close-btn:hover {
-      color: red;
-    }
+  .close-btn {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 24px;
+    cursor: pointer;
+    align-self: flex-end;
+    user-select: none;
+  }
 
-    .btn.clicked {
-      transform: translateX(-100%) translateY(-50%);
-      opacity: 0;
-    }
+  .close-btn:hover {
+    color: white;
+  }
 
-    .center-image.clicked {
-      transform: translate(-50%, -40%) scale(10);
-      opacity: 0;
-    }
+  #startScreen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
 
-    #title.clicked,
-    #creditsBtn.clicked {
-      transform: translateX(-100%) translateY(-50%);
-      opacity: 0;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
-    #startScreen {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  #startButton {
+    padding: 20px 40px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    color: red;
+    background: black;
+    border: 3px solid red;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 0 15px red;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+
+  #startButton:hover {
+    background: red;
+    color: black;
+    box-shadow: 0 0 30px red;
+  }
+
+  h3 {
+    font-size: 18px;
+    text-shadow: 0 0 5px red;
+    margin-bottom: 5px;
+    user-select: none;
+  }
+
+  h5 {
+    font-size: 14px;
+    margin-left: 10px;
+    color: #ff9999;
+    user-select: none;
+  }
+  /* Animaciones comunes para desaparecer con estilo */
+.btn.clicked,
+#title.clicked,
+#creditsBtn.clicked {
+  animation: slideOutLeft 1s forwards;
 }
 
-#startButton {
-  padding: 20px 40px;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 16px;
-  color: white;
-  background: rgba(30,30,30,0.8);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.3s;
+.center-image.clicked {
+  animation: zoomFadeOut 1.5s forwards;
 }
 
-#startButton:hover {
-  background: rgba(50,50,50,0.9);
-}
-h3 {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 15px;
-  color: red;
-  text-align: center;
-  margin: 10px 0;
-  text-shadow: 1px 1px 0 #444;
+/* Animaciones definidas */
+@keyframes slideOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-150%);
+  }
 }
 
-  </style>
-</head>
-<body>
+@keyframes zoomFadeOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 0 80px black);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(8);
+    filter: drop-shadow(0 0 300px black);
+  }
+}
+
+</style>
+
 <div id="startScreen">
-  <button id="startButton">COMENZAR</button>
+  <button id="startButton" data-text="COMENZAR">COMENZAR</button>
 </div>
 
-  <div class="left-panel">
-    <div id="title" style="font-size: 32px; font-weight: bold;
-      background: linear-gradient(to right, red, blanchedalmond);
-      -webkit-background-clip: text;
-      color: transparent;">
-      abuela
-    </div>
+<div class="left-panel">
+  <div id="title">abuela</div>
 
-    <button class="btn" id="startBtn" onclick="startGame(this)">Comenzar</button>
-    <button class="btn" id="continueBtn" onclick="startGame(this)">Continuar</button>
-    <button class="btn" id="creditsBtn" onclick="showCredits()">Créditos</button>
-  </div>
+  <button class="btn" data-text="Comenzar" id="startBtn" onclick="startGame(this)">Comenzar</button>
+  <button class="btn" data-text="Continuar" id="continueBtn" onclick="startGame(this)">Continuar</button>
+  <button class="btn" data-text="Créditos" id="creditsBtn" onclick="showCredits()">Créditos</button>
+</div>
 
-  <img class="center-image" src="pressets/inicioabuela.png" alt="Imagen central">
+<img class="center-image" src="pressets/inicioabuela.png" alt="Imagen central">
 
-  <div id="credits" class="credits-panel">
-    <button class="close-btn" onclick="document.getElementById('credits').style.display = 'none'">×</button>
-    <h3>desarrolladores</h3>
-    <h5>+ALEJANDRO</h5>
-    <h5>+WALISON</h5>
-    <h3>artistas</h3>
-    <h5>Jordan</h5>
-    <h5>Maria</h5>
-    <h5>Alejandro</h5>
-    <h3>musica y sonido</h3>
-    <h5>Walison</h5>
-    <h3>codigos y programación </h3>
-    <h5>ALEJANDRO </h5>
-  </div>
+<div id="credits" class="credits-panel">
+  <button class="close-btn" onclick="document.getElementById('credits').style.display = 'none'">×</button>
+  <h3>desarrolladores</h3>
+  <h5>+ALEJANDRO</h5>
+  <h5>+WALISON</h5>
+  <h3>artistas</h3>
+  <h5>Jordan</h5>
+  <h5>Maria</h5>
+  <h5>Alejandro</h5>
+  <h3>música y sonido</h3>
+  <h5>Walison</h5>
+  <h3>códigos y programación</h3>
+  <h5>ALEJANDRO</h5>
+</div>
 
-  <script>
-    function startGame(btn) {
-      btn.classList.add('clicked');
-      document.getElementById('startBtn').classList.add('clicked');
-      document.getElementById('continueBtn').classList.add('clicked');
-      document.getElementById('creditsBtn').classList.add('clicked');
-      document.getElementById('title').classList.add('clicked');
-      document.querySelector('.center-image').classList.add('clicked');
-
-      setTimeout(() => {
-        window.location.href = 'carga.html';
-      }, 1000);
-    }
-
-    function showCredits() {
-      document.getElementById('credits').style.display = 'flex';
-    }
-    const startScreen = document.getElementById("startScreen");
-const startButton = document.getElementById("startButton");
-const ambientSound = new Audio('pressets/ambiental.mp3');
+<script>
+  const ambientSound = new Audio('pressets/ambiental.mp3');
 ambientSound.loop = true;
-ambientSound.volume = 0.5;
+ambientSound.volume = 0.4;
+
+const startScreen = document.getElementById("startScreen");
+const startButton = document.getElementById("startButton");
 
 startButton.addEventListener("click", () => {
   ambientSound.play().catch(() => {});
   startScreen.style.display = "none";
 });
 
-  </script>
+function startGame(btn) {
+  btn.classList.add('clicked');
+  document.getElementById('startBtn').classList.add('clicked');
+  document.getElementById('continueBtn').classList.add('clicked');
+  document.getElementById('creditsBtn').classList.add('clicked');
+  document.getElementById('title').classList.add('clicked');
+  document.querySelector('.center-image').classList.add('clicked');
 
-</body>
-</html>
+  setTimeout(() => {
+    if (btn.id === 'startBtn') {
+      // El jugador quiere comenzar desde cero
+      localStorage.setItem('continuar', '0');
+      localStorage.setItem('lastLevel', 'lvl1.html'); // Reiniciar progreso
+    } else if (btn.id === 'continueBtn') {
+      // El jugador quiere continuar desde donde quedó
+      const lastLevel = localStorage.getItem('lastLevel') || 'lvl1.html';
+      localStorage.setItem('targetLevel', lastLevel);
+      localStorage.setItem('continuar', '1');
+    }
+
+    window.location.href = 'carga.html';
+  }, 1000);
+}
+
+function showCredits() {
+  document.getElementById('credits').style.display = 'flex';
+}
+
+</script>

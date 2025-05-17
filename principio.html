@@ -1,60 +1,179 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: 'Press Start 2P', monospace;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Intro Aterradora</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    .text {
-      font-size: 14px;
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', monospace;
+    color: #fff;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    background: url('https://i.imgur.com/3v74Y7F.png');
+    opacity: 0.05;
+    animation: staticNoise 0.2s infinite;
+    z-index: 10;
+  }
+  
+  @keyframes staticNoise {
+    0% {background-position: 0 0;}
+    100% {background-position: 100% 100%;}
+  }
+
+  .text-container {
+    text-align: center;
+    z-index: 20;
+    filter: drop-shadow(0 0 10px red);
+  }
+
+  .line {
+    font-size: 14px;
+    opacity: 0;
+    white-space: nowrap;
+  }
+
+  .line1 {
+    animation: burnInOut 4s ease forwards;
+  }
+  .line2 {
+    animation: burnInOut 4s ease forwards;
+    animation-delay: 4.5s;
+  }
+
+  .final {
+    font-size: 30px;
+    font-weight: bold;
+    color: crimson;
+    margin-top: 30px;
+    opacity: 0;
+    text-shadow:
+      0 0 5px crimson,
+      0 0 10px crimson,
+      0 0 20px darkred,
+      0 0 30px darkred;
+    animation: scaryAppearOut 5s forwards;
+    animation-delay: 9.5s;
+  }
+
+  @keyframes burnInOut {
+    0% {
       opacity: 0;
-      transition: opacity 2s ease;
-      margin: 10px 0;
+      filter: brightness(0) saturate(0);
+      text-shadow: none;
+      color: white;
+      text-decoration: none;
     }
-
-    .visible {
+    20% {
       opacity: 1;
+      filter: brightness(1) saturate(1);
+      text-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000,
+        0 0 30px #a60000;
+      color: #ff0000;
     }
-  </style>
+    80% {
+      opacity: 1;
+      filter: brightness(1) saturate(1);
+      color: #ff0000;
+      text-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+      text-decoration: none;
+    }
+    100% {
+      opacity: 0;
+      filter: brightness(0.3) saturate(0.5);
+      color: #660000;
+      text-shadow: none;
+      text-decoration: line-through;
+    }
+  }
+
+  @keyframes scaryAppearOut {
+    0% {
+      opacity: 0;
+      transform: scale(1.3) rotate(-10deg);
+      filter: blur(5px);
+      text-shadow: none;
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+      filter: blur(0);
+      text-shadow:
+        0 0 10px crimson,
+        0 0 20px crimson,
+        0 0 30px darkred,
+        0 0 40px darkred;
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.05) rotate(2deg);
+      text-shadow:
+        0 0 15px crimson,
+        0 0 25px crimson,
+        0 0 40px darkred;
+    }
+    90% {
+      opacity: 0;
+      transform: scale(0.9) rotate(-5deg);
+      filter: blur(3px);
+      text-shadow: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Temblor leve en la palabra final */
+  .final.shake {
+    animation: shake 0.3s infinite alternate;
+    animation-delay: 11.5s;
+  }
+  
+  @keyframes shake {
+    0% { transform: translate(0, 0) rotate(0deg);}
+    100% { transform: translate(3px, -2px) rotate(1deg);}
+  }
+
+</style>
 </head>
 <body>
 
-  <div id="line1" class="text visible">Wale Studios</div>
-  <div id="line2" class="text visible">presenta...</div>
-  <div id="finalText" class="text">Abuela</div>
+  <div class="text-container">
+    <div id="line1" class="line line1">Wale Studios</div>
+    <div id="line2" class="line line2">presenta...</div>
+    <div id="finalText" class="final">Abuela</div>
+  </div>
 
-  <script>
-    // Oculta "Wale Studios" y "presenta..."
-    setTimeout(() => {
-      document.getElementById('line1').classList.remove('visible');
-      document.getElementById('line2').classList.remove('visible');
-    }, 2000);
+<script>
+  // Agregar temblor a "Abuela" cuando está visible
+  setTimeout(() => {
+    document.getElementById('finalText').classList.add('shake');
+  }, 11000);
 
-    // Muestra "Abuela"
-    setTimeout(() => {
-      document.getElementById('finalText').classList.add('visible');
-    }, 4000);
-
-    // Redirige a inicio.html
-    setTimeout(() => {
-      window.location.href = "inicio.html";
-    }, 7000);
-  </script>
+  // Redirigir al final de la animación de la palabra final (unos 14s)
+  setTimeout(() => {
+    window.location.href = "inicio.html";
+  }, 14500);
+</script>
 
 </body>
 </html>
