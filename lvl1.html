@@ -207,6 +207,43 @@
   0%, 100% { background-color: rgba(0, 0, 0, 0.8); }
   50% { background-color: rgba(0, 0, 0, 0.7); }
 }
+#btnA, #btnB {
+  position: fixed;
+  right: 30px;
+  display: none;
+  z-index: 10;
+  width: 50px;
+  height: 50px;
+  font-family: 'Press Start 2P', cursive, monospace;
+  font-size: 24px;
+  color: white;
+  background-color: #1a1a1a;
+  border: 3px solid #fff;
+  box-shadow:
+    2px 2px 0 #000,
+    4px 4px 0 #444;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  line-height: 44px;
+  image-rendering: pixelated;
+}
+
+#btnA {
+  bottom: 150px;
+}
+
+#btnB {
+  bottom: 80px;
+}
+
+#btnA:hover, #btnB:hover {
+  background-color: #444;
+  border-color: #0f0;
+  box-shadow:
+    2px 2px 0 #0f0,
+    4px 4px 0 #0a0;
+}
 
   </style>
 </head>
@@ -214,6 +251,8 @@
   <div id="startScreen">
   <button id="startBtn" onclick="startGame()">START</button>
 </div>
+<button id="btnA">A</button>
+<button id="btnB">B</button>
 
 <canvas id="game"></canvas>
 <div id="linterna"></div>
@@ -335,6 +374,11 @@ let tieneLlavePL = false;
 const iconoSonido = new Image();
 iconoSonido.src = "pressets/sonido.png";
 const distanciaIconoSonido = 450; // Ajusta este valor para más o menos alcance
+const btnA = document.getElementById("btnA");
+const btnB = document.getElementById("btnB");
+
+let llaveCerca = null;
+let puertaCerca = null;
 
 objetos.push({ x: 60, y: 450, w: 120, h: 150, textura: texturasObjetos[0] });
 objetos.push({ x: 660, y: 60, w: 120, h: 180, textura: texturasObjetos[1] });
@@ -373,6 +417,7 @@ let llavesObtenidas = {
   llave2: false,
   llave3: false,
 };
+const DISTANCIA_ACTIVACION = 90; // o 80, lo que prefieras
 
 let vx = 0, vy = 0;
 let tick = 0;
@@ -527,27 +572,27 @@ function loop() {
     }
   }
 
-  // Colisión con puertasExtras cerradas
-  for (let puerta of puertasExtras) {
-    if (!puerta.abierta && colisionPL(player, puerta)) {
-      if (llavesObtenidas[puerta.llave]) {
-        puerta.abierta = true;
-      } else {
-        colisionX = true;
-      }
+// Colisión con puertasExtras cerradas (solo bloquea si no tenés la llave)
+for (let puerta of puertasExtras) {
+  if (!puerta.abierta && colisionPL(player, puerta)) {
+    if (!llavesObtenidas[puerta.llave]) {
+      colisionX = true;
     }
   }
+}
 
-  // Colisión con puerta original
-  for (let obj of puertayllave) {
-    if (obj.tipo === "puerta" && !obj.abierta && colisionPL(player, obj)) {
-      if (tieneLlavePL) {
-        obj.abierta = true;
-      } else {
-        colisionX = true;
-      }
+// Colisión con puerta original (solo bloquea si no tenés la llave)
+for (let obj of puertayllave) {
+  if (obj.tipo === "puerta" && colisionPL(player, obj)) {
+    if (!obj.abierta && !tieneLlavePL) {
+      colisionX = true;
+    }
+    // Condición extra general: bloquea si está cerrada
+    if (!obj.abierta) {
+      colisionX = true;
     }
   }
+}
 
   if (colisionX) {
     player.x = prevX;
@@ -573,49 +618,29 @@ function loop() {
     }
   }
 
-  // Colisión con puertasExtras cerradas
-  for (let puerta of puertasExtras) {
-    if (!puerta.abierta && colisionPL(player, puerta)) {
-      if (llavesObtenidas[puerta.llave]) {
-        puerta.abierta = true;
-      } else {
-        colisionY = true;
-      }
-    }
-  }
+// Colisión con puertasExtras cerradas (solo bloquea si no tenés la llave)
+for (let puerta of puertasExtras) {
+  if (colisionPL(player, puerta) && !puerta.abierta) {
+  colisionY = true;
+}
 
-  // Colisión con puerta original
-  for (let obj of puertayllave) {
-    if (obj.tipo === "puerta" && !obj.abierta && colisionPL(player, obj)) {
-      if (tieneLlavePL) {
-        obj.abierta = true;
-      } else {
-        colisionY = true;
-      }
+}
+
+// Colisión con puerta original (solo bloquea si no tenés la llave)
+for (let obj of puertayllave) {
+  if (obj.tipo === "puerta" && !obj.abierta && colisionPL(player, obj)) {
+    if (!tieneLlavePL) {
+      colisionY = true;
     }
   }
+}
 
   if (colisionY) {
     player.y = prevY;
     vy = 0;
   }
 
-  // Recoger llaves nuevas
-  for (let llave of llavesExtras) {
-    if (!llave.recogida && colisionPL(player, llave)) {
-      llave.recogida = true;
-      llavesObtenidas[llave.id] = true;
-    }
-  }
-
-  // Recoger llave original
-  for (let obj of puertayllave) {
-    if (obj.tipo === "llave" && !obj.recogida && colisionPL(player, obj)) {
-      obj.recogida = true;
-      tieneLlavePL = true;
-    }
-  }
-
+  
   if (!dead) {
     const nextX = player.x + vx;
     const nextY = player.y + vy;
@@ -703,6 +728,53 @@ for (let puerta of puertasExtras) {
               puerta.id === "puerta2" ? texturasExtra.puerta2 : texturasExtra.puerta3;
   ctx.drawImage(img, puerta.x, puerta.y, puerta.w, puerta.h);
 }
+llaveCerca = null;
+puertaCerca = null;
+
+// Buscar cercanía con llaves
+for (let obj of puertayllave) {
+  if (obj.tipo === "llave" && !obj.recogida && colisionPL(player, {
+  ...obj,
+  x: obj.x - DISTANCIA_ACTIVACION / 2,
+  y: obj.y - DISTANCIA_ACTIVACION / 2,
+  w: obj.w + DISTANCIA_ACTIVACION,
+  h: obj.h + DISTANCIA_ACTIVACION
+})
+) {
+    llaveCerca = obj;
+    break;
+  }
+}
+for (let llave of llavesExtras) {
+  if (!llave.recogida && colisionPL(player, { ...llave, x: llave.x - 15, y: llave.y - 15, w: llave.w + 30, h: llave.h + 30 })) {
+    llaveCerca = llave;
+    break;
+  }
+}
+
+// Buscar cercanía con puertas
+for (let obj of puertayllave) {
+  if (obj.tipo === "puerta" && !obj.abierta && tieneLlavePL && colisionPL(player, {
+  ...obj,
+  x: obj.x - DISTANCIA_ACTIVACION / 2,
+  y: obj.y - DISTANCIA_ACTIVACION / 2,
+  w: obj.w + DISTANCIA_ACTIVACION,
+  h: obj.h + DISTANCIA_ACTIVACION
+})
+) {
+    puertaCerca = obj;
+    break;
+  }
+}
+for (let puerta of puertasExtras) {
+  if (!puerta.abierta && llavesObtenidas[puerta.llave] && colisionPL(player, { ...puerta, x: puerta.x - 15, y: puerta.y - 15, w: puerta.w + 30, h: puerta.h + 30 })) {
+    puertaCerca = puerta;
+    break;
+  }
+}
+
+btnA.style.display = llaveCerca ? "block" : "none";
+btnB.style.display = puertaCerca ? "block" : "none";
 
   // Jugador
   ctx.save();
@@ -779,6 +851,34 @@ function resetGame() {
   document.getElementById("deathScreen").style.display = "none";
 }
 document.getElementById("deathScreen").style.display = "none";
+btnA.addEventListener("click", () => {
+  if (!llaveCerca) return;
+
+  if (llaveCerca.tipo === "llave") {
+    llaveCerca.recogida = true;
+    tieneLlavePL = true;
+  } else if (llaveCerca.id === "llave2" || llaveCerca.id === "llave3") {
+    llaveCerca.recogida = true;
+    llavesObtenidas[llaveCerca.id] = true;
+  }
+
+  btnA.style.display = "none";
+});
+
+btnB.addEventListener("click", () => {
+  if (!puertaCerca) return;
+
+  if (puertaCerca.tipo === "puerta" && tieneLlavePL) {
+    puertaCerca.abierta = true;
+  } else if (puertaCerca.id === "puerta2" || puertaCerca.id === "puerta3") {
+    const llaveID = puertaCerca.llave;
+    if (llavesObtenidas[llaveID]) {
+      puertaCerca.abierta = true;
+    }
+  }
+
+  btnB.style.display = "none";
+});
 
 </script>
 </body>
