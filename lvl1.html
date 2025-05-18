@@ -244,6 +244,114 @@
     2px 2px 0 #0f0,
     4px 4px 0 #0a0;
 }
+    #interactionPrompt {
+
+        position: fixed;
+
+        bottom: 70px; /* Adjusted position */
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.75);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-family: 'Press Start 2P', cursive, monospace;
+        font-size: 14px;
+        z-index: 1000;
+        display: none; /* Hidden by default */
+        border: 1px solid #555;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+#armarioPanel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1001;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#cerrarArmario {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 28px;
+  background: transparent;
+  color: white;
+  border: none;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+}
+
+#cajonesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cajonBtn {
+  width: 250px;
+  height: 50px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  background: #222;
+  color: white;
+  border: 2px solid #555;
+  text-align: center;
+  line-height: 50px;
+  box-shadow: 0 0 10px #000;
+}
+.cajonBtn.abierto {
+  background: #888;
+  border-color: #fff;
+}
+#cajonPanel {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1002;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#cerrarCajon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 28px;
+  background: transparent;
+  color: white;
+  border: none;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+}
+
+#objetosCajon {
+  width: 90%;
+  height: 70%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.objetoCajon {
+  width: 60px;
+  height: 60px;
+  background: #333;
+  border: 2px solid #888;
+  border-radius: 6px;
+  position: absolute;
+  cursor: pointer;
+}
 
   </style>
 </head>
@@ -253,6 +361,16 @@
 </div>
 <button id="btnA">A</button>
 <button id="btnB">B</button>
+<div id="interactionPrompt"></div>
+<div id="armarioPanel">
+  <button id="cerrarArmario">×</button>
+  <div id="cajonesContainer"></div>
+</div>
+<div id="cajonPanel">
+  <button id="cerrarCajon">×</button>
+  <div id="objetosCajon"></div>
+</div>
+
 
 <canvas id="game"></canvas>
 <div id="linterna"></div>
@@ -325,9 +443,18 @@ function startGame() {
   document.getElementById('startScreen').style.display = 'none';
   // Aquí puedes poner otras funciones que inicialicen el juego
 }
+const armarioPanel = document.getElementById("armarioPanel");
+const cerrarArmario = document.getElementById("cerrarArmario");
+const cajonesContainer = document.getElementById("cajonesContainer");
 
 enemy.images[0].src = "pressets/enemigo1.jpg";
 enemy.images[1].src = "pressets/enemigo2.jpg";
+let armarioCerca = false;
+const cajonPanel = document.getElementById("cajonPanel");
+const cerrarCajon = document.getElementById("cerrarCajon");
+const objetosCajon = document.getElementById("objetosCajon");
+
+let objetosRecogidos = []; // aquí se guardarán los objetos recogidos
 
 const walls = [
   { x: 0, y: 0, w: 2400, h: 60, color: "#777" },
@@ -363,6 +490,8 @@ const texturasPL = {
 texturasPL.llave.src = "pressets/llave.png";
 texturasPL.puerta.src = "pressets/puerta.jpg";
 texturasPL.puertaAbierta.src = "pressets/puertacerrada.png";
+const interactionPromptElement = document.getElementById("interactionPrompt");
+const RANGO_MENSAJE = 220; // Puedes ajustar este valor luego
 
 const puertayllave = [
   { x: 750, y: 1650, w: 60, h: 75, tipo: "llave", recogida: false }, // llave escalada ×3
@@ -381,7 +510,7 @@ let llaveCerca = null;
 let puertaCerca = null;
 
 objetos.push({ x: 60, y: 450, w: 120, h: 150, textura: texturasObjetos[0] });
-objetos.push({ x: 660, y: 60, w: 120, h: 180, textura: texturasObjetos[1] });
+objetos.push({ x: 660, y: 6000000, w: 120, h: 180, textura: texturasObjetos[1] });
 objetos.push({ x: 720, y: 960, w: 180, h: 240, textura: texturasObjetos[2] });
 objetos.push({ x: 1500, y: 300, w: 150, h: 150, textura: texturasObjetos[3] });
 objetos.push({ x: 951, y: 1500, w: 180, h: 240, textura: texturasObjetos[4] });
@@ -393,12 +522,56 @@ const texturasExtra = {
   puerta3: new Image(),
   puertaAbierta: new Image()
 };
+const texturaArmario = new Image();
+texturaArmario.src = "pressets/armario.png";
 
 texturasExtra.llave2.src = "pressets/llave.png";
 texturasExtra.llave3.src = "pressets/llave.png";
 texturasExtra.puerta2.src = "pressets/puerta.jpg";
 texturasExtra.puerta3.src = "pressets/puerta.jpg";
 texturasExtra.puertaAbierta.src = "pressets/puertacerrada.png";
+const armarioInteractivo = {
+  x: 660, y: 60,
+  w: 150, h: 200,
+  textura: texturaArmario,
+  interactivo: true,
+  cajones: [
+    {
+      abierto: false,
+      objetos: [
+        { id: "llaveVieja", textura: "pressets/llave.png" },
+        { id: "reloj", textura: "pressets/reloj.png" },
+        { id: "nota", textura: "pressets/nota.png" },
+        { id: "linterna", textura: "pressets/linterna.png" },
+        { id: "bala", textura: "pressets/bala.png" }
+      ]
+    },
+    {
+      abierto: false,
+      objetos: [
+        { id: "papel1", textura: "pressets/papel1.png" },
+        { id: "foto", textura: "pressets/foto.png" },
+        { id: "bateria", textura: "pressets/bateria.png" },
+        { id: "llave2", textura: "pressets/llave.png" },
+        { id: "botella", textura: "pressets/botella.png" }
+      ]
+    },
+    {
+      abierto: false,
+      objetos: [
+        { id: "fusible", textura: "pressets/fusible.png" },
+        { id: "plano", textura: "pressets/plano.png" },
+        { id: "diario", textura: "pressets/diario.png" },
+        { id: "pila", textura: "pressets/pila.png" },
+        { id: "tornillo", textura: "pressets/tornillo.png" }
+      ]
+    }
+  ]
+};
+
+objetos.push(armarioInteractivo);
+
+
 
 const llavesExtras = [
   { x: 1800, y: 90, w: 60, h: 60, recogida: false, id: "llave2" },
@@ -409,6 +582,27 @@ const puertasExtras = [
   { x: 2100, y: 900, w: 240, h: 60, abierta: false, id: "puerta2", llave: "llave2" },
   { x: 1500, y: 1590, w: 60, h: 150, abierta: false, id: "puerta3", llave: "llave3" }
 ];
+const distanciaActivacion = 250;
+
+function calcularDistancia(objA, objB) {
+  const centroAx = objA.x + objA.w / 2;
+  const centroAy = objA.y + objA.h / 2;
+  const centroBx = objB.x + objB.w / 2;
+  const centroBy = objB.y + objB.h / 2;
+  return Math.hypot(centroAx - centroBx, centroAy - centroBy);
+}
+
+function mostrarMensajeInteraccion(player, armario) {
+  const prompt = document.getElementById('interactionPrompt');
+  const distancia = calcularDistancia(player, armario);
+  if (distancia <= distanciaActivacion) {
+    prompt.style.display = 'block';
+    prompt.textContent = 'Presiona A para revisar el armario polvoriento';
+  } else {
+    prompt.style.display = 'none';
+  }
+}
+
 
 // Este código va en cada nivel
 localStorage.setItem('lastLevel', 'lvl1.html'); // Reemplazá por el nivel correspondiente
@@ -687,6 +881,59 @@ if (playerVolume > 0.05) {
       contactTime = 0;
     }
   }
+let mostrarMensaje = false;
+let mensajeTexto = "";
+
+function verificarInteraccion(obj, tieneLlave) {
+  if (!obj.abierta) {
+    const dist = distanceBetween(player.x, player.y, obj.x + obj.w / 2, obj.y + obj.h / 2);
+    if (dist < RANGO_MENSAJE) {
+      return tieneLlave ? "PRESIONA [B] PARA ABRIR LA PUERTA" : "BUSCA UNA LLAVE";
+    }
+  }
+  return null;
+}
+
+// Verificar puertas de puertayllave
+for (let obj of puertayllave) {
+  if (obj.tipo === "puerta") {
+    const texto = verificarInteraccion(obj, tieneLlavePL);
+    if (texto) {
+      mostrarMensaje = true;
+      mensajeTexto = texto;
+      break;
+    }
+  }
+}
+
+// Verificar puertasExtras solo si no se encontró mensaje antes
+if (!mostrarMensaje) {
+  for (let puerta of puertasExtras) {
+    const tieneLlave = llavesObtenidas[puerta.llave];
+    const texto = verificarInteraccion(puerta, tieneLlave);
+    if (texto) {
+      mostrarMensaje = true;
+      mensajeTexto = texto;
+      break;
+    }
+  }
+}
+
+// Verificar armario solo si no se encontró mensaje antes
+if (!mostrarMensaje) {
+  const distArmario = distanceBetween(player.x, player.y, armarioInteractivo.x + armarioInteractivo.w / 2, armarioInteractivo.y + armarioInteractivo.h / 2);
+  if (distArmario < RANGO_MENSAJE) {
+    mostrarMensaje = true;
+    mensajeTexto = "PRESIONA [A] PARA ABRIR EL ARMARIO";
+  }
+}
+
+if (mostrarMensaje) {
+  interactionPromptElement.textContent = mensajeTexto;
+  interactionPromptElement.style.display = 'block';
+} else {
+  interactionPromptElement.style.display = 'none';
+}
 
   moveEnemy();
 // Sonido del enemigo con atenuación por distancia
@@ -730,6 +977,19 @@ for (let puerta of puertasExtras) {
 }
 llaveCerca = null;
 puertaCerca = null;
+armarioCerca = false;
+
+const distanciaArmario = 250;
+
+const distArm = distanceBetween(
+  player.x + player.w/2, player.y + player.h/2,
+  armarioInteractivo.x + armarioInteractivo.w/2,
+  armarioInteractivo.y + armarioInteractivo.h/2
+);
+
+if (distArm < distanciaArmario) {
+  armarioCerca = true;
+}
 
 // Buscar cercanía con llaves
 for (let obj of puertayllave) {
@@ -773,7 +1033,8 @@ for (let puerta of puertasExtras) {
   }
 }
 
-btnA.style.display = llaveCerca ? "block" : "none";
+btnA.style.display = (llaveCerca || armarioCerca) ? "block" : "none";
+
 btnB.style.display = puertaCerca ? "block" : "none";
 
   // Jugador
@@ -852,17 +1113,22 @@ function resetGame() {
 }
 document.getElementById("deathScreen").style.display = "none";
 btnA.addEventListener("click", () => {
-  if (!llaveCerca) return;
-
-  if (llaveCerca.tipo === "llave") {
-    llaveCerca.recogida = true;
-    tieneLlavePL = true;
-  } else if (llaveCerca.id === "llave2" || llaveCerca.id === "llave3") {
-    llaveCerca.recogida = true;
-    llavesObtenidas[llaveCerca.id] = true;
+  if (llaveCerca) {
+    if (llaveCerca.tipo === "llave") {
+      llaveCerca.recogida = true;
+      tieneLlavePL = true;
+    } else if (llaveCerca.id === "llave2" || llaveCerca.id === "llave3") {
+      llaveCerca.recogida = true;
+      llavesObtenidas[llaveCerca.id] = true;
+    }
+    btnA.style.display = "none";
+    return;
   }
 
-  btnA.style.display = "none";
+  if (armarioCerca) {
+    mostrarPanelArmario();
+    btnA.style.display = "none";
+  }
 });
 
 btnB.addEventListener("click", () => {
@@ -878,6 +1144,59 @@ btnB.addEventListener("click", () => {
   }
 
   btnB.style.display = "none";
+});
+function mostrarPanelArmario() {
+  cajonesContainer.innerHTML = "";
+
+  armarioInteractivo.cajones.forEach((cajon, i) => {
+    const btn = document.createElement("div");
+    btn.classList.add("cajonBtn");
+    if (cajon.abierto) btn.classList.add("abierto");
+
+    btn.textContent = `Cajón ${i + 1}`;
+
+    btn.addEventListener("click", () => {
+  armarioInteractivo.cajones.forEach(c => c.abierto = false);
+  cajon.abierto = true;
+  mostrarPanelArmario(); // refresca
+
+  mostrarCajon(cajon); // abre panel del cajón
+});
+
+    cajonesContainer.appendChild(btn);
+  });
+
+  armarioPanel.style.display = "flex";
+}
+cerrarArmario.addEventListener("click", () => {
+  armarioPanel.style.display = "none";
+  armarioInteractivo.cajones.forEach(c => c.abierto = false);
+});
+function mostrarCajon(cajon) {
+  objetosCajon.innerHTML = "";
+
+  cajon.objetos.forEach((objeto, i) => {
+    const div = document.createElement("div");
+    div.classList.add("objetoCajon");
+
+    div.style.left = `${Math.random() * 80 + 10}%`;
+    div.style.top = `${Math.random() * 70 + 10}%`;
+
+    div.style.backgroundImage = `url('${objeto.textura}')`;
+    div.style.backgroundSize = "cover";
+
+    div.addEventListener("click", () => {
+      objetosRecogidos.push(objeto.id);
+      div.remove(); // Quita visualmente el objeto
+    });
+
+    objetosCajon.appendChild(div);
+  });
+
+  cajonPanel.style.display = "flex";
+}
+cerrarCajon.addEventListener("click", () => {
+  cajonPanel.style.display = "none";
 });
 
 </script>
