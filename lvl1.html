@@ -16,73 +16,162 @@
       width: 100vw;
       height: 100vh;
     }
-    #joystick {
-      position: absolute; bottom: 30px; left: 30px;
-      width: 100px; height: 100px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); border: 2px solid #888;
-    }
-    #stick {
-      position: absolute; width: 40px; height: 40px;
-      background: #ccc; border-radius: 50%;
-      top: 30px; left: 30px;
-    }
-    #linterna {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      background: radial-gradient(circle at center, transparent 5px, rgba(0, 0, 0, 1) 100px);
-      transition: background 0.3s ease;
-    }
+#joystick {
+  position: absolute; bottom: 30px; left: 30px;
+  width: 100px; height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #888;
+  image-rendering: pixelated;
+}
+
+#stick {
+  position: absolute;
+  width: 40px; height: 40px;
+  background: #ccc;
+  top: 30px; left: 30px;
+  image-rendering: pixelated;
+  /* Sin border-radius para esquinas cuadradas */
+  /* Puedes agregar un borde grueso estilo 8-bit */
+  border: 2px solid #666;
+  box-sizing: border-box;
+}
+
+#linterna {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 15px, rgba(0, 0, 0, 1) 300px);
+  animation: linternaPulse 3s ease-in-out infinite;
+}
+
+@keyframes linternaPulse {
+  0%, 100% {
+    background: radial-gradient(circle at center, transparent 15px, rgba(0, 0, 0, 1) 300px);
+  }
+  50% {
+    background: radial-gradient(circle at center, transparent 25px, rgba(0, 0, 0, 1) 320px);
+  }
+}
 
     /* Estilos pantalla de muerte */
-    #deathScreen {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      display: flex;
-    }
+   #deathScreen {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 0, 0, 0.95);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  display: flex;
+  filter: drop-shadow(0 0 10px crimson);
+  animation: pulsarRojo 2s infinite alternate;
+}
 
-    #deathContent {
-      background: linear-gradient(to right, #5F5F5F, #ABABAB);
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 0 20px #000;
-    }
+@keyframes pulsarRojo {
+  0% { background-color: rgba(15, 0, 0, 0.85); }
+  100% { background-color: rgba(40, 0, 0, 1); }
+}
 
-    #deathContent h1 {
-      color: white;
-      font-family: 'Press Start 2P', monospace;
-      margin-bottom: 20px;
-      font-size: 28px;
-    }
+#deathContent {
+  background: linear-gradient(90deg, #330000, #660000);
+  padding: 40px 50px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 40px 5px crimson;
+  border: 4px solid #8B0000;
+  position: relative;
+  overflow: hidden;
+}
 
-    #deathContent button {
-      margin: 10px;
-      padding: 12px 24px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 16px;
-      
-      border: none;
-      border-radius: 5px;
-      background: #FF0000;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+#deathContent::before {
+  content: "";
+  position: absolute;
+  top: -10px; left: -10px; right: -10px; bottom: -10px;
+  border: 3px dashed crimson;
+  border-radius: 12px;
+  pointer-events: none;
+  animation: sangrar 1.5s infinite;
+}
 
-    #deathContent button:hover {
-      background: #777;
-    }
+@keyframes sangrar {
+  0%, 100% { border-color: crimson; }
+  50% { border-color: darkred; }
+}
+
+#deathContent h1 {
+  color: #FF1A1A;
+  font-family: 'Creepster', cursive, monospace;
+  margin-bottom: 30px;
+  font-size: 36px;
+  text-shadow: 0 0 15px crimson, 0 0 20px red;
+  letter-spacing: 3px;
+  animation: parpadeoTitulo 2s infinite ease-in-out;
+}
+
+@keyframes parpadeoTitulo {
+  0%, 100% {
+    color: #FF1A1A;
+    text-shadow: 0 0 15px crimson, 0 0 20px red;
+    opacity: 1;
+  }
+  50% {
+    color: #FF4D4D;
+    text-shadow: 0 0 30px crimson, 0 0 40px red;
+    opacity: 0.7;
+  }
+  75% {
+    color: #FF0000;
+    text-shadow: 0 0 25px crimson, 0 0 35px red;
+    opacity: 0.85;
+  }
+}
+
+#deathContent button {
+  margin: 15px;
+  padding: 14px 30px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  border: 2px solid #FF0000;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #990000, #FF0000);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 10px crimson;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+#deathContent button:hover {
+  background: linear-gradient(135deg, #FF0000, #660000);
+  box-shadow: 0 0 20px crimson;
+}
+#deathContent button.parpadeante {
+  animation-name: parpadeoLuz;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+#deathContent button.delay1 {
+  animation-duration: 1.2s;
+  animation-delay: 0s;
+}
+
+#deathContent button.delay2 {
+  animation-duration: 1.2s;
+  animation-delay: 0.6s; /* medio ciclo desfasado */
+}
+
+@keyframes parpadeoLuz {
+  0%, 100% { opacity: 1; }
+  10%, 30%, 50%, 70%, 90% { opacity: 0.3; }
+  20%, 40%, 60%, 80% { opacity: 0.8; }
+}
+
   </style>
 </head>
 <body>
@@ -95,8 +184,9 @@
 <div id="deathScreen">
   <div id="deathContent">
     <h1>Has muerto</h1>
-    <button onclick="resetGame()">Reintentar</button>
-    <button onclick="window.location.href='inicio.html'">Rendirse</button>
+<button class="parpadeante delay1" onclick="resetGame()">Reintentar</button>
+<button class="parpadeante delay2" onclick="window.location.href='inicio.html'">Rendirse</button>
+
   </div>
 </div>
 
@@ -120,9 +210,9 @@ let contactTime = 0;
 const player = {
   x: 100,
   y: 100,
-  w: 32,
-  h: 32,
-  speed: 0.9,
+  w: 100,
+  h: 100,
+  speed: 2,
   flip: false,
   frame: 0,
   images: [new Image(), new Image()]
@@ -131,11 +221,11 @@ player.images[0].src = "pressets/player1.png";
 player.images[1].src = "pressets/player2.png";
 
 const enemy = {
-  x: 300,
-  y: 250,
-  w: 40,
-  h: 40,
-  speed: 1.3,
+  x: 900,
+  y: 750,
+  w: 120,
+  h: 120,
+  speed: 1.95,
   frame: 0,
   flip: false,
   images: [new Image(), new Image()],
@@ -143,22 +233,24 @@ const enemy = {
   tick: 0,
   wanderAngle: 0
 };
+
 enemy.images[0].src = "pressets/enemigo1.jpg";
 enemy.images[1].src = "pressets/enemigo2.jpg";
 
 const walls = [
-  { x: 0, y: 0, w: 800, h: 20, color: "#777" },
-  { x: 0, y: 580, w: 800, h: 20, color: "#777" },
-  { x: 0, y: 0, w: 20, h: 600, color: "#777" },
-  { x: 780, y: 0, w: 20, h: 600, color: "#777" },
-  { x: 200, y: 0, w: 20, h: 150, color: "#777" },
-  { x: 400, y: 0, w: 20, h: 200, color: "#777" },
-  { x: 0, y: 200, w: 150, h: 20, color: "#777" },
-  { x: 100, y: 300, w: 600, h: 20, color: "#777" },
-  { x: 300, y: 300, w: 20, h: 280, color: "#777" },
-  { x: 500, y: 300, w: 20, h: 230, color: "#777" },
-  { x: 200, y: 200, w: 200, h: 20, color: "#777" }
+  { x: 0, y: 0, w: 2400, h: 60, color: "#777" },
+  { x: 0, y: 1740, w: 2400, h: 60, color: "#777" },
+  { x: 0, y: 0, w: 60, h: 1800, color: "#777" },
+  { x: 2340, y: 0, w: 60, h: 1800, color: "#777" },
+  { x: 600, y: 0, w: 60, h: 450, color: "#777" },
+  { x: 1200, y: 0, w: 60, h: 600, color: "#777" },
+  { x: 0, y: 600, w: 450, h: 60, color: "#777" },
+  { x: 300, y: 900, w: 1800, h: 60, color: "#777" },
+  { x: 900, y: 900, w: 60, h: 840, color: "#777" },
+  { x: 1500, y: 900, w: 60, h: 690, color: "#777" },
+  { x: 600, y: 600, w: 600, h: 60, color: "#777" }
 ];
+
 let objetos = [];
 
 // Crear cinco texturas diferentes
@@ -181,21 +273,22 @@ texturasPL.puerta.src = "pressets/puerta.jpg";
 texturasPL.puertaAbierta.src = "pressets/puertacerrada.png";
 
 const puertayllave = [
-  { x: 250, y: 550, w: 20, h: 25, tipo: "llave", recogida: false },
-  { x: 200, y: 220, w: 60, h: 80, tipo: "puerta", abierta: false }
+  { x: 750, y: 1650, w: 60, h: 75, tipo: "llave", recogida: false }, // llave escalada ×3
+  { x: 600, y: 660, w: 225, h: 240, tipo: "puerta", abierta: false } // puerta escalada ×1.5
 ];
+
 
 let tieneLlavePL = false;
 const iconoSonido = new Image();
 iconoSonido.src = "pressets/sonido.png";
-const distanciaIconoSonido = 150; // Ajusta este valor para más o menos alcance
+const distanciaIconoSonido = 450; // Ajusta este valor para más o menos alcance
 
-// Añadir 5 objetos al array
-objetos.push({ x: 20, y: 150, w: 40, h: 50, textura: texturasObjetos[0] });
-objetos.push({ x: 220, y: 20, w: 40, h: 60, textura: texturasObjetos[1] });
-objetos.push({ x: 240, y: 320, w: 60, h: 80, textura: texturasObjetos[2] });
-objetos.push({ x: 500, y: 100, w: 50, h: 50, textura: texturasObjetos[3] });
-objetos.push({ x: 317, y: 500, w: 60, h: 80, textura: texturasObjetos[4] });
+objetos.push({ x: 60, y: 450, w: 120, h: 150, textura: texturasObjetos[0] });
+objetos.push({ x: 660, y: 60, w: 120, h: 180, textura: texturasObjetos[1] });
+objetos.push({ x: 720, y: 960, w: 180, h: 240, textura: texturasObjetos[2] });
+objetos.push({ x: 1500, y: 300, w: 150, h: 150, textura: texturasObjetos[3] });
+objetos.push({ x: 951, y: 1500, w: 180, h: 240, textura: texturasObjetos[4] });
+
 const texturasExtra = {
   llave2: new Image(),
   llave3: new Image(),
@@ -211,14 +304,15 @@ texturasExtra.puerta3.src = "pressets/puerta.jpg";
 texturasExtra.puertaAbierta.src = "pressets/puertacerrada.png";
 
 const llavesExtras = [
-  { x: 600, y: 30, w: 20, h: 20, recogida: false, id: "llave2" },
-  { x: 550, y: 350, w: 20, h: 20, recogida: false, id: "llave3" }
+  { x: 1800, y: 90, w: 60, h: 60, recogida: false, id: "llave2" },
+  { x: 1650, y: 1060, w: 60, h: 60, recogida: false, id: "llave3" }
 ];
 
 const puertasExtras = [
-  { x: 700, y: 299, w: 80, h: 20, abierta: false, id: "puerta2", llave: "llave2" },
-  { x: 500, y: 530, w: 20, h: 50, abierta: false, id: "puerta3", llave: "llave3" }
+  { x: 2100, y: 900, w: 240, h: 60, abierta: false, id: "puerta2", llave: "llave2" },
+  { x: 1500, y: 1590, w: 60, h: 150, abierta: false, id: "puerta3", llave: "llave3" }
 ];
+
 // Este código va en cada nivel
 localStorage.setItem('lastLevel', 'lvl1.html'); // Reemplazá por el nivel correspondiente
 
@@ -316,7 +410,7 @@ function distanceBetween(x1, y1, x2, y2) {
 
 function moveEnemy() {
   const dist = distanceBetween(player.x, player.y, enemy.x, enemy.y);
-  enemy.chasing = dist < 100;
+  enemy.chasing = dist < 300;
 
   let dx = 0, dy = 0;
 
@@ -519,7 +613,7 @@ if (playerVolume > 0.05) {
   moveEnemy();
 // Sonido del enemigo con atenuación por distancia
 const distToPlayer = distanceBetween(player.x, player.y, enemy.x, enemy.y);
-const maxDist = 1000;
+const maxDist = 3000;
 const vol = Math.max(0, 1 - distToPlayer / maxDist);
 enemyStepSound.volume = vol;
 
@@ -584,22 +678,21 @@ for (let obj of puertayllave) {
     ctx.drawImage(img, obj.x, obj.y, obj.w, obj.h);
   }
 }
-// Icono de sonido si el enemigo está cerca
 const dxIcono = enemy.x + enemy.w / 2 - (player.x + player.w / 2);
 const dyIcono = enemy.y + enemy.h / 2 - (player.y + player.h / 2);
 const distancia = Math.hypot(dxIcono, dyIcono);
 
 if (distancia < distanciaIconoSonido) {
   const angulo = Math.atan2(dyIcono, dxIcono);
-  const radio = 50; // Distancia del icono alrededor del jugador (ajustable)
+  const radio = 100; // Distancia del icono alrededor del jugador, ajustado al tamaño jugador
 
   const iconoX = player.x + player.w / 2 + Math.cos(angulo) * radio;
   const iconoY = player.y + player.h / 2 + Math.sin(angulo) * radio;
 
   ctx.save();
-  ctx.translate(iconoX, iconoY); // Posición circular alrededor del jugador
-  ctx.rotate(angulo - Math.PI / 2); // Apunta con la parte de arriba del icono hacia el enemigo
-  ctx.drawImage(iconoSonido, -16, -16, 64, 64); // Tamaño del icono
+  ctx.translate(iconoX, iconoY);
+  ctx.rotate(angulo - Math.PI / 2);
+  ctx.drawImage(iconoSonido, -32, -32, 64, 64); // Tamaño icono 64x64 centrado en el punto
   ctx.restore();
 }
 
