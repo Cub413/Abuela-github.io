@@ -171,10 +171,50 @@
   10%, 30%, 50%, 70%, 90% { opacity: 0.3; }
   20%, 40%, 60%, 80% { opacity: 0.8; }
 }
+#startScreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: flickerBG 2s infinite;
+}
+
+#startBtn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 20px;
+  padding: 20px 40px;
+  background: #8b0000;
+  color: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 0 15px crimson, 0 0 30px red;
+  cursor: pointer;
+  animation: flickerBtn 1.8s infinite alternate;
+  text-shadow: 0 0 4px #fff, 0 0 6px red;
+}
+
+@keyframes flickerBtn {
+  0% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes flickerBG {
+  0%, 100% { background-color: rgba(0, 0, 0, 0.8); }
+  50% { background-color: rgba(0, 0, 0, 0.7); }
+}
 
   </style>
 </head>
 <body>
+  <div id="startScreen">
+  <button id="startBtn" onclick="startGame()">START</button>
+</div>
+
 <canvas id="game"></canvas>
 <div id="linterna"></div>
 
@@ -233,6 +273,19 @@ const enemy = {
   tick: 0,
   wanderAngle: 0
 };
+function startGame() {
+  const screen = document.documentElement;
+  if (screen.requestFullscreen) {
+    screen.requestFullscreen();
+  } else if (screen.webkitRequestFullscreen) {
+    screen.webkitRequestFullscreen();
+  } else if (screen.msRequestFullscreen) {
+    screen.msRequestFullscreen();
+  }
+
+  document.getElementById('startScreen').style.display = 'none';
+  // Aquí puedes poner otras funciones que inicialicen el juego
+}
 
 enemy.images[0].src = "pressets/enemigo1.jpg";
 enemy.images[1].src = "pressets/enemigo2.jpg";
